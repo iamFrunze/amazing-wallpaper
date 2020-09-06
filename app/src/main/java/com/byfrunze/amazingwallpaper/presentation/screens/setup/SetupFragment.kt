@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.presentation.helpers.injectViewModel
 import com.byfrunze.amazingwallpaper.presentation.viewstate.LoadStatus
@@ -49,6 +51,7 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
 
         Glide.with(view)
             .load(background)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .optionalCenterCrop()
             .into(image_view_setup)
 
@@ -158,13 +161,10 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
     private fun bindViewState(viewState: SetupState) {
         when (viewState.loadStatus) {
             is LoadStatus.Loading -> {
-
+                animation_view.visibility = View.VISIBLE
             }
             is LoadStatus.Success -> {
-
-            }
-            is LoadStatus.Error -> {
-
+                animation_view.visibility = View.GONE
             }
         }
     }

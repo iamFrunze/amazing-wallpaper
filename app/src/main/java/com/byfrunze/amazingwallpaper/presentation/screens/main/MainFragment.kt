@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.data.Wallpaper
 import com.byfrunze.amazingwallpaper.presentation.helpers.Identify
@@ -57,7 +58,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         var page = 2
 
         adapter.loadImages = object : OnLoadImages {
-            override fun inLoad(load: Boolean) {
+            override fun onLoad(load: Boolean) {
                 if (load) {
                     Log.i("TAG", "PAGE $page $term")
                     if (term.isEmpty())
@@ -111,8 +112,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             viewStates().observe(viewLifecycleOwner, Observer { bindViewState(it) })
             viewEffects().observe(viewLifecycleOwner, Observer { bindViewAction(it) })
         }
-        gridLayoutManager = GridLayoutManager(requireContext(), 3)
-
+        gridLayoutManager = GridLayoutManager(requireContext(), 2)
         mainViewModel.obtainEvent(viewEvent = SideEffect.ScreenShow(term = ""), flag = POPULAR.flag)
         recycler_view_images_main.adapter = adapter
         recycler_view_images_main.layoutManager = gridLayoutManager
@@ -123,23 +123,22 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun bindViewState(viewState: UserViewState) {
         when (viewState.authStatus) {
             is AuthStatus.Loading -> {
-                recycler_view_images_main.visibility = View.GONE
-                progress_bar_main.visibility = View.VISIBLE
+                animation_view.visibility = View.VISIBLE
             }
             is AuthStatus.Success -> {
-                progress_bar_main.visibility = View.GONE
-                recycler_view_images_main.visibility = View.VISIBLE
+                animation_view.visibility = View.GONE
                 viewState.data?.let {
                     adapter.initArray(it)
                 }
 
             }
             is AuthStatus.AddMoreWallpaper -> {
+                animation_view.visibility = View.GONE
                 viewState.data?.let {
-                    Log.i("SEARCH", it.toString())
                     adapter.addImages(it)
                 }
             }
+
         }
     }
 

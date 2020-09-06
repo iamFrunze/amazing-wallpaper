@@ -32,8 +32,7 @@ class MainViewModel
     lateinit var iRepositories: IRepositories
 
     private fun initialWallpaper(auth: String, term: String, flag: Int) {
-
-        Log.i("SEARCH", term + "$flag")
+        viewState = viewState.copy(authStatus = AuthStatus.Loading)
         when (flag) {
             POPULAR.flag -> {
                 val popular =
@@ -57,18 +56,15 @@ class MainViewModel
                 compositeDisposable.addAll(popular)
             }
             SEARCH.flag -> {
+                viewState =
+                    viewState.copy(authStatus = AuthStatus.Loading, flag = SEARCH.flag)
                 val disposable = iRepositories
                     .getSearch(auth = auth, term = term, page = 1)
                     .debounce(1000, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        viewState =
-                            UserViewState(
-                                authStatus = AuthStatus.Success,
-                                data = it.wallpapers,
-                                flag = SEARCH.flag
-                            )
+                        viewState = viewState.copy(authStatus = AuthStatus.Success, data = it.wallpapers)
 
                     }, {
                         viewAction = MainAction.ShowError(error = it.localizedMessage)
@@ -82,8 +78,7 @@ class MainViewModel
     }
 
     private fun loadMoreWallpaper(auth: String, page: Int, term: String, flag: Int) {
-        Log.i("SEARCH", "LOAD" + term + "$flag")
-
+        viewState = viewState.copy(authStatus = AuthStatus.Loading)
         when (flag) {
             POPULAR.flag -> {
                 val popular =
@@ -102,27 +97,22 @@ class MainViewModel
                         }, {
                             viewAction = MainAction.ShowError(error = it.localizedMessage)
                         })
-
                 compositeDisposable.addAll(popular)
             }
             SEARCH.flag -> {
+                viewState =
+                    viewState.copy(authStatus = AuthStatus.AddMoreWallpaper, flag = SEARCH.flag)
                 val disposable = iRepositories
                     .getSearch(auth = auth, term = term, page = page)
                     .debounce(1000, TimeUnit.MILLISECONDS)
+                    .distinctUntilChanged()
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        viewState =
-                            UserViewState(
-                                authStatus = AuthStatus.AddMoreWallpaper,
-                                data = it.wallpapers,
-                                flag = SEARCH.flag
-                            )
-                        Log.i("SEARCH", it.wallpapers.toString())
+                        viewState = viewState.copy(data = it.wallpapers)
 
                     }, {
                         viewAction = MainAction.ShowError(error = it.localizedMessage)
-                        Log.i("SEARCH", it.localizedMessage)
 
                     })
                 compositeDisposable.add(disposable)

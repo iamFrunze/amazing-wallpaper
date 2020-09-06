@@ -3,16 +3,18 @@ package com.byfrunze.amazingwallpaper.presentation.screens.setup
 import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
+import android.os.Handler
 import android.provider.MediaStore
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.byfrunze.amazingwallpaper.presentation.base.BaseViewModel
-import com.byfrunze.amazingwallpaper.presentation.viewstate.*
+import com.byfrunze.amazingwallpaper.presentation.viewstate.LoadStatus
+import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupAction
+import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupEffect
+import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupState
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -20,7 +22,7 @@ class SetupViewModel
 @Inject constructor() : BaseViewModel<SetupState, SetupAction, SetupEffect>() {
 
     init {
-        viewState = SetupState(loadStatus = LoadStatus.Loading)
+        viewState = SetupState(loadStatus = LoadStatus.Success)
     }
 
     override fun obtainEvent(viewEvent: SetupEffect, flag: Int) {
@@ -39,11 +41,11 @@ class SetupViewModel
     }
 
     private fun setupScreenLock(url: String, context: Context) {
+        viewState = viewState.copy(loadStatus = LoadStatus.Loading)
         val wallpaperManager = WallpaperManager.getInstance(context)
         Glide.with(context).asBitmap()
             .load(url)
-            .centerCrop()
-            .override(1080, 2220)
+            .optionalCenterCrop()
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     viewAction =
@@ -54,7 +56,9 @@ class SetupViewModel
                                 true,
                                 WallpaperManager.FLAG_LOCK
                             )
+                            viewState = viewState.copy(loadStatus = LoadStatus.Success)
                             SetupAction.ShowSnackBar("Изображение установленно на рабочий стол")
+
                         } else SetupAction.ShowSnackBar("Ваш телефон не поддерживает данную функцию")
                 }
 
@@ -64,6 +68,7 @@ class SetupViewModel
     }
 
     private fun setupScreen(url: String, context: Context) {
+        viewState = viewState.copy(loadStatus = LoadStatus.Loading)
         val wallpaperManager = WallpaperManager.getInstance(context)
         Glide.with(context).asBitmap()
             .load(url)
@@ -74,6 +79,8 @@ class SetupViewModel
                     wallpaperManager.setBitmap(resource)
                     viewAction =
                         SetupAction.ShowSnackBar("Изображение установленно на рабочий стол")
+                    viewState = viewState.copy(loadStatus = LoadStatus.Success)
+
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {
@@ -82,6 +89,7 @@ class SetupViewModel
     }
 
     private fun download(drawable: String, context: Context) {
+        viewState = viewState.copy(loadStatus = LoadStatus.Loading)
         Glide.with(context).asBitmap()
             .load(drawable)
             .into(object : CustomTarget<Bitmap>() {
@@ -93,6 +101,7 @@ class SetupViewModel
                         "IB${Random.nextInt(120)}"
                     )
                     viewAction = SetupAction.ShowSnackBar("Изображение сохранено в галерею")
+                    viewState = viewState.copy(loadStatus = LoadStatus.Success)
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {
