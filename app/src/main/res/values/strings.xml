@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Amazing wallpaper</string>
+    <string name="search">Поиск</string>
+
+    <string name="api_key">8304bf2e6183717d7caa61fe4ba68da2</string>
+    <string name="setup_screen">Установить на рабочий стол</string>
+    <string name="setup_lock_screen">Установить на экран блокировки</string>
+    <string name="download">Скачать</string>
+</resources>

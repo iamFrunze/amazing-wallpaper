@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.byfrunze.amazingwallpaper.presentation.screens.main.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_targetCategoryFragment"
+            app:destination="@id/targetCategoryFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_setupFragment"
+            app:destination="@id/setupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupFragment"
+        android:name="com.byfrunze.amazingwallpaper.presentation.screens.setup.SetupFragment"
+        android:label="fragment_setup"
+        tools:layout="@layout/fragment_setup" />
+    <fragment
+        android:id="@+id/targetCategoryFragment"
+        android:name="com.byfrunze.amazingwallpaper.presentation.screens.tragetcategory.TargetCategoryFragment"
+        android:label="fragment_target_category"
+        tools:layout="@layout/fragment_target_category" >
+        <action
+            android:id="@+id/action_targetCategoryFragment_to_setupFragment"
+            app:destination="@id/setupFragment" />
+    </fragment>
+</navigation>
