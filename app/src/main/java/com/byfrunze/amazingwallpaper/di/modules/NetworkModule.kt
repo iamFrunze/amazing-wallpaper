@@ -1,5 +1,7 @@
 package com.byfrunze.amazingwallpaper.di.modules
 
+import android.content.Context
+import com.bumptech.glide.Glide
 import com.byfrunze.amazingwallpaper.di.AppScope
 import com.byfrunze.amazingwallpaper.network.IRepositories
 import dagger.Module
@@ -24,4 +26,8 @@ class NetworkModule {
     @AppScope
     fun provideApiInterface(retrofit: Retrofit): IRepositories =
         retrofit.create(IRepositories::class.java)
+
+    @Provides
+    @AppScope
+    fun provideGlide(context: Context) = Glide.with(context)
 }

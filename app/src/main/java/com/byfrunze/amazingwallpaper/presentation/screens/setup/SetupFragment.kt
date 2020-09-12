@@ -2,34 +2,36 @@ package com.byfrunze.amazingwallpaper.presentation.screens.setup
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
+import android.transition.TransitionInflater
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
-import android.widget.Toast.makeText
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.presentation.helpers.injectViewModel
-import com.byfrunze.amazingwallpaper.presentation.viewstate.LoadStatus
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupAction
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupEffect
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupState
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_setup.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class SetupFragment : Fragment(R.layout.fragment_setup) {
 
     @Inject
     lateinit var viewModeFactory: ViewModelProvider.Factory
+
+    val args: SetupFragmentArgs by navArgs()
 
     private lateinit var setupViewModel: SetupViewModel
     private val MY_PERMISSIONS_REQUEST_CODE = 1
@@ -38,6 +40,12 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
+        setEnterTransition()
+    }
+
+
+    private fun setEnterTransition(){
+        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,13 +55,40 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
             requireContext(),
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
-        background = arguments?.getString("url", "")
+        setEnterTransition()
+        postponeEnterTransition()
+        val args = args.uri
+        background = args
+        image_view_setup.apply {
+            transitionName = args
+            Glide.with(this)
+                .load(args)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .optionalCenterCrop()
+                .listener(object : RequestListener<Drawable>{
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
 
-        Glide.with(view)
-            .load(background)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .optionalCenterCrop()
-            .into(image_view_setup)
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+                })
+                .into(this)
+        }
 
         text_view_download.setOnClickListener {
             requestPermission()
@@ -87,9 +122,7 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
                 )
             }
         }
-        image_view_toback.setOnClickListener {
-            findNavController().navigate(R.id.mainFragment)
-        }
+
     }
 
     private fun requestPermission() {

@@ -1,5 +1,7 @@
 package com.byfrunze.amazingwallpaper.network
 
+import com.byfrunze.amazingwallpaper.data.Categories
+import com.byfrunze.amazingwallpaper.data.Category
 import com.byfrunze.amazingwallpaper.data.Popular
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
@@ -22,4 +24,11 @@ interface IRepositories {
         @Query("page") page: Int = 1
     ): Observable<Popular>
 
+    @GET("api2.0/get.php")
+    fun getCategories(
+        @Query("auth") auth: String,
+        @Query("method") method: String = "category",
+        @Query("id") id: String,
+        @Query("page") page: Int = 1
+    ): Observable<Popular>
 }

@@ -53,7 +53,9 @@ ext {
     def glideVersion = "4.11.0"
     glide = [
             glide   : "com.github.bumptech.glide:glide:$glideVersion",
-            compiler: "com.github.bumptech.glide:compiler:$glideVersion"
+            compiler: "com.github.bumptech.glide:compiler:$glideVersion",
+            recycler: "com.github.bumptech.glide:recyclerview-integration:$glideVersion"
+
     ]
     lottie = 'com.airbnb.android:lottie:3.4.2'
 

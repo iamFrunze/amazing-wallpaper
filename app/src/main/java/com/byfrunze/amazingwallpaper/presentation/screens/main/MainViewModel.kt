@@ -1,150 +1,106 @@
 package com.byfrunze.amazingwallpaper.presentation.screens.main
 
 import android.util.Log
+import com.bumptech.glide.RequestManager
+import com.byfrunze.amazingwallpaper.data.Wallpaper
 import com.byfrunze.amazingwallpaper.network.IRepositories
 import com.byfrunze.amazingwallpaper.presentation.base.BaseViewModel
-import com.byfrunze.amazingwallpaper.presentation.helpers.Identify
-import com.byfrunze.amazingwallpaper.presentation.helpers.Identify.*
-import com.byfrunze.amazingwallpaper.presentation.viewstate.AuthStatus
-import com.byfrunze.amazingwallpaper.presentation.viewstate.MainAction
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SideEffect
-import com.byfrunze.amazingwallpaper.presentation.viewstate.UserViewState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainViewModel
-@Inject constructor() : BaseViewModel<UserViewState, MainAction, SideEffect>() {
+@Inject constructor() : BaseViewModel<MainViewState, MainAction, SideEffect>() {
 
     private val compositeDisposable = CompositeDisposable()
 
     init {
         viewState =
-            UserViewState(authStatus = AuthStatus.Loading, data = emptyList(), flag = POPULAR.flag)
-
+            MainViewState(
+                wallpaperStatus = WallpaperStatus.Loading,
+                data = emptyList()
+            )
     }
 
-    val API_KEY = "8304bf2e6183717d7caa61fe4ba68da2"
+    private val API_KEY = "8304bf2e6183717d7caa61fe4ba68da2"
 
     @Inject
     lateinit var iRepositories: IRepositories
 
-    private fun initialWallpaper(auth: String, term: String, flag: Int) {
-        viewState = viewState.copy(authStatus = AuthStatus.Loading)
-        when (flag) {
-            POPULAR.flag -> {
-                val popular =
-                    iRepositories.getPopular(
-                        auth = auth
-                    )
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            viewState =
-                                UserViewState(
-                                    authStatus = AuthStatus.Success,
-                                    data = it.wallpapers,
-                                    flag = POPULAR.flag
-                                )
-                        }, {
-                            viewAction = MainAction.ShowError(error = it.localizedMessage)
+    @Inject
+    lateinit var glide: RequestManager
 
-                        })
 
-                compositeDisposable.addAll(popular)
-            }
-            SEARCH.flag -> {
-                viewState =
-                    viewState.copy(authStatus = AuthStatus.Loading, flag = SEARCH.flag)
-                val disposable = iRepositories
-                    .getSearch(auth = auth, term = term, page = 1)
-                    .debounce(1000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        viewState = viewState.copy(authStatus = AuthStatus.Success, data = it.wallpapers)
+    private fun initialWallpaper(id: String) {
+        viewState = viewState.copy(wallpaperStatus = WallpaperStatus.Loading)
+        val disposable = iRepositories.getCategories(
+            auth = API_KEY,
+            id = id
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                cacheWallpaper(wallpapers = it.wallpapers)
+                viewState = viewState.copy(wallpaperStatus = WallpaperStatus.Success)
 
-                    }, {
-                        viewAction = MainAction.ShowError(error = it.localizedMessage)
-                        Log.i("SEARCH", "tthis" + it.localizedMessage)
+            }, {
+                viewAction = MainAction.ShowError(error = it.localizedMessage)
 
-                    })
-                compositeDisposable.add(disposable)
-            }
+            })
+
+        compositeDisposable.add(disposable)
+    }
+
+    private fun cacheWallpaper(wallpapers: List<Wallpaper>) {
+        for (wallpaper in wallpapers) {
+            glide.downloadOnly()
+                .load(wallpaper.url_image)
+                .preload()
+
         }
+        viewState = viewState.copy(data = wallpapers)
+        Log.i("RX", "KST")
 
     }
 
-    private fun loadMoreWallpaper(auth: String, page: Int, term: String, flag: Int) {
-        viewState = viewState.copy(authStatus = AuthStatus.Loading)
-        when (flag) {
-            POPULAR.flag -> {
-                val popular =
-                    iRepositories.getPopular(
-                        auth = auth,
-                        page = page
+
+    private fun loadMoreWallpaper(page: Int, id: String) {
+        viewState = viewState.copy(wallpaperStatus = WallpaperStatus.Loading)
+        val disposable =
+            iRepositories.getCategories(
+                auth = API_KEY,
+                page = page,
+                id = id
+            )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    cacheWallpaper(wallpapers = it.wallpapers)
+
+                    viewState = viewState.copy(
+                        wallpaperStatus = WallpaperStatus.AddMoreWallpaper
                     )
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            viewState = UserViewState(
-                                authStatus = AuthStatus.AddMoreWallpaper,
-                                data = it.wallpapers,
-                                flag = POPULAR.flag
-                            )
-                        }, {
-                            viewAction = MainAction.ShowError(error = it.localizedMessage)
-                        })
-                compositeDisposable.addAll(popular)
-            }
-            SEARCH.flag -> {
-                viewState =
-                    viewState.copy(authStatus = AuthStatus.AddMoreWallpaper, flag = SEARCH.flag)
-                val disposable = iRepositories
-                    .getSearch(auth = auth, term = term, page = page)
-                    .debounce(1000, TimeUnit.MILLISECONDS)
-                    .distinctUntilChanged()
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        viewState = viewState.copy(data = it.wallpapers)
 
-                    }, {
-                        viewAction = MainAction.ShowError(error = it.localizedMessage)
-
-                    })
-                compositeDisposable.add(disposable)
-            }
-        }
+                }, {
+                    viewAction = MainAction.ShowError(error = it.localizedMessage)
+                })
+        compositeDisposable.add(disposable)
     }
 
 
-    override fun obtainEvent(viewEvent: SideEffect, flag: Int) {
+    override fun obtainEvent(viewEvent: SideEffect) {
         when (viewEvent) {
             is SideEffect.ScreenShow -> {
-                Log.i("SEARCH", "EVENT $flag")
-                initialWallpaper(
-                    auth = API_KEY,
-                    term = viewEvent.term,
-                    flag = flag
-                )
+                initialWallpaper(id = viewEvent.id)
             }
-            is SideEffect.LoadMoreWallpaper -> {
-                Log.i("TAG", "${viewEvent.page}")
-                loadMoreWallpaper(
-                    auth = API_KEY,
-                    page = viewEvent.page,
-                    term = viewEvent.term,
-                    flag = viewState.flag
-                )
-
-
-            }
-
+            is SideEffect.LoadMoreWallpaper -> loadMoreWallpaper(
+                page = viewEvent.page,
+                id = viewEvent.id
+            )
         }
     }
+
 
     override fun onCleared() {
         super.onCleared()

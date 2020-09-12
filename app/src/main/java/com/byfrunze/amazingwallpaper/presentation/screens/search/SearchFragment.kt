@@ -1,6 +1,8 @@
-package com.byfrunze.amazingwallpaper.presentation.screens.main
+package com.byfrunze.amazingwallpaper.presentation.screens.search
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -15,20 +17,20 @@ import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.data.Wallpaper
 import com.byfrunze.amazingwallpaper.presentation.helpers.injectViewModel
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.search.*
 import javax.inject.Inject
 
-
-class MainFragment : Fragment(R.layout.fragment_main) {
+class SearchFragment : Fragment(R.layout.fragment_search) {
 
     @Inject
     lateinit var viewModeFactory: ViewModelProvider.Factory
 
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var searchViewModel: SearchViewModel
 
-    private val adapter = MainAdapter()
+    private val adapter = SearchAdapter()
 
-    var id = "1"
+    private var term = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -36,48 +38,62 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mainViewModel = injectViewModel(factory = viewModeFactory)
-
-
+        searchViewModel = injectViewModel(factory = viewModeFactory)
 
         adapter.imagesAdapterClicks = object : ImagesAdapterClicks {
             override fun onItemClick(model: Wallpaper, image: ImageView) {
                 val extras = FragmentNavigatorExtras(image to model.url_image)
                 val action =
-                    MainFragmentDirections.actionMainFragmentToSetupFragment(model.url_image)
+                    SearchFragmentDirections.actionSearchFragmentToSetupFragment(model.url_image)
                 findNavController().navigate(action, extras)
             }
         }
-
         var page = 2
+
         adapter.loadImages = object : OnLoadImages {
             override fun onLoad(load: Boolean) {
-                if (load) mainViewModel.obtainEvent(SideEffect.LoadMoreWallpaper(page = page++, id = id))
+                if (load) searchViewModel.obtainEvent(
+                    SearchEffect.LoadMoreWallpaper(
+                        page = page++,
+                        term = term
+                    )
+                )
             }
         }
-    }
 
+
+        edit_text_search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                Log.i("RX", "BE")
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                term = p0.toString()
+
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+                searchViewModel.obtainEvent(SearchEffect.ScreenShow(term = edit_text_search.text.toString()))
+                  }
+        })
+
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        arguments?.let {
-            id = it.getString("nameofcat", "1")
-        }
-
-        Log.i("RX", "ED $id")
-        mainViewModel.apply {
+        searchViewModel.apply {
             viewStates().observe(viewLifecycleOwner, Observer { bindViewState(it) })
             viewEffects().observe(viewLifecycleOwner, Observer { bindViewAction(it) })
         }
-        mainViewModel.obtainEvent(viewEvent = SideEffect.ScreenShow(id = id))
+        searchViewModel.obtainEvent(viewEvent = SearchEffect.ScreenShow(term = term))
 
-        recycler_view_images_main.adapter = adapter
-        recycler_view_images_main.layoutManager = GridLayoutManager(requireContext(), 3)
+        recycler_view_search.adapter = adapter
+        recycler_view_search.layoutManager = GridLayoutManager(requireContext(), 3)
 
     }
 
-    private fun bindViewState(viewState: MainViewState) {
+    private fun bindViewState(viewState: SearchViewState) {
         when (viewState.wallpaperStatus) {
             is WallpaperStatus.Loading -> loading()
             is WallpaperStatus.Success -> success(
@@ -102,9 +118,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         adapter.addImages(arrayOfData)
     }
 
-    private fun bindViewAction(viewAction: MainAction) {
+    private fun bindViewAction(viewAction: SearchAction) {
         when (viewAction) {
-            is MainAction.ShowError -> {
+            is SearchAction.ShowError -> {
                 Toast.makeText(
                     requireContext(),
                     viewAction.error,
@@ -113,6 +129,5 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
         }
     }
-
 
 }

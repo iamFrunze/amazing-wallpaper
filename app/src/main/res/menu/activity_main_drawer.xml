@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_abstract"
+            android:titleCondensed="1"
+            android:title="@string/Abstract" />
+        <item
+            android:id="@+id/nav_animal"
+            android:titleCondensed="2"
+            android:title="@string/Animal" />
+        <item
+            android:id="@+id/nav_anime"
+            android:titleCondensed="3"
+
+            android:title="@string/Anime" />
+
+        <item
+            android:id="@+id/nav_artistic"
+            android:titleCondensed="4"
+
+            android:title="@string/Artistic" />
+        <item
+            android:id="@+id/nav_celebrity"
+            android:titleCondensed="7"
+
+            android:title="@string/Celebrity" />
+        <item
+            android:id="@+id/nav_comics"
+            android:titleCondensed="8"
+
+            android:title="@string/Comics" />
+        <item
+            android:id="@+id/nav_dark"
+            android:titleCondensed="9"
+
+            android:title="@string/Dark" />
+        <item
+            android:id="@+id/nav_earth"
+            android:titleCondensed="10"
+
+            android:title="@string/Earth" />
+        <item
+            android:id="@+id/nav_fantasy"
+            android:titleCondensed="11"
+
+            android:title="@string/Fantasy" />
+        <item
+            android:id="@+id/nav_food"
+            android:titleCondensed="12"
+            android:title="@string/Food" />
+        <item
+            android:id="@+id/nav_game"
+            android:titleCondensed="14"
+            android:title="@string/Game" />
+        <item
+            android:id="@+id/nav_holiday"
+            android:titleCondensed="15"
+            android:title="@string/Holiday" />
+        <item
+            android:id="@+id/nav_humor"
+            android:titleCondensed="13"
+            android:title="@string/Humor" />
+        <item
+            android:id="@+id/nav_man_made"
+            android:titleCondensed="16"
+            android:title="@string/Man_Made" />
+        <item
+            android:id="@+id/nav_men"
+            android:titleCondensed="17"
+            android:title="@string/Men" />
+        <item
+            android:id="@+id/nav_military"
+            android:titleCondensed="18"
+            android:title="@string/Military" />
+        <item
+            android:id="@+id/nav_misc"
+            android:titleCondensed="19"
+            android:title="@string/Misc" />
+        <item
+            android:id="@+id/nav_movie"
+            android:titleCondensed="20"
+            android:title="@string/Movie" />
+        <item
+            android:id="@+id/nav_music"
+            android:titleCondensed="22"
+            android:title="@string/Music" />
+        <item
+            android:id="@+id/nav_photo"
+            android:titleCondensed="24"
+            android:title="@string/Photography" />
+        <item
+            android:id="@+id/nav_prod"
+            android:titleCondensed="25"
+            android:title="@string/Products" />
+        <item
+            android:id="@+id/nav_relig"
+            android:titleCondensed="26"
+            android:title="@string/Religious" />
+
+        <item
+            android:id="@+id/nav_sci"
+            android:titleCondensed="27"
+            android:title="@string/Sci_Fi" />
+        <item
+            android:id="@+id/nav_sports"
+            android:titleCondensed="28"
+
+            android:title="@string/Sports" />
+        <item
+            android:id="@+id/nav_tech"
+            android:titleCondensed="30"
+            android:title="@string/Technology" />
+        <item
+            android:id="@+id/nav_tv"
+            android:titleCondensed="29"
+            android:title="@string/TV_Show" />
+        <item
+            android:id="@+id/nav_veh"
+            android:titleCondensed="31"
+            android:title="@string/Vehicles" />
+        <item
+            android:id="@+id/nav_video_game"
+            android:titleCondensed="32"
+            android:title="@string/Video_Game" />
+        <item
+            android:id="@+id/nav_weapons"
+            android:titleCondensed="34"
+            android:title="@string/Weapons" />
+        <item
+            android:id="@+id/nav_women"
+            android:titleCondensed="33"
+            android:title="@string/Women" />
+
+    </group>
+</menu>

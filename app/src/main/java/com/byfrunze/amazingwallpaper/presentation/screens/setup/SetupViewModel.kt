@@ -4,17 +4,11 @@ import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.os.Handler
 import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.byfrunze.amazingwallpaper.presentation.base.BaseViewModel
-import com.byfrunze.amazingwallpaper.presentation.viewstate.LoadStatus
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupAction
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupEffect
-import com.byfrunze.amazingwallpaper.presentation.viewstate.SetupState
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -25,18 +19,16 @@ class SetupViewModel
         viewState = SetupState(loadStatus = LoadStatus.Success)
     }
 
-    override fun obtainEvent(viewEvent: SetupEffect, flag: Int) {
+    override fun obtainEvent(viewEvent: SetupEffect) {
         when (viewEvent) {
-            is SetupEffect.Download -> {
+            is SetupEffect.Download ->
                 download(drawable = viewEvent.drawableUrl, context = viewEvent.context)
-            }
-            is SetupEffect.SetupScreen -> {
-                setupScreen(url = viewEvent.drawableUrl, context = viewEvent.context)
-            }
 
-            is SetupEffect.SetupScreenLock -> {
+            is SetupEffect.SetupScreen ->
+                setupScreen(url = viewEvent.drawableUrl, context = viewEvent.context)
+
+            is SetupEffect.SetupScreenLock ->
                 setupScreenLock(url = viewEvent.drawableUrl, context = viewEvent.context)
-            }
         }
     }
 

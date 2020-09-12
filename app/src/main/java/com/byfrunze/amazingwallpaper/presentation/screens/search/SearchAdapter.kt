@@ -1,23 +1,13 @@
-package com.byfrunze.amazingwallpaper.presentation.screens.main
+package com.byfrunze.amazingwallpaper.presentation.screens.search
 
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.ListPreloader
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.data.Wallpaper
 import kotlinx.android.synthetic.main.cell_main_screen.view.*
@@ -32,7 +22,7 @@ interface OnLoadImages {
 }
 
 
-class MainAdapter : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
+class SearchAdapter : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
     private val arrayOfImages: MutableList<Wallpaper> = ArrayList()
 
@@ -78,7 +68,6 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
         fun bind(model: Wallpaper) {
             Glide.with(image)
                 .load(model.url_image)
-                //.override(600,600)
                 .thumbnail(0.5f)
                 .placeholder(R.drawable.placeholder)
                 .transition(DrawableTransitionOptions.withCrossFade())

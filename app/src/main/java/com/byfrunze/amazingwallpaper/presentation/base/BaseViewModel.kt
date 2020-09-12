@@ -33,5 +33,5 @@ abstract class BaseViewModel<S, A, E> : ViewModel() {
             _viewActions.postValue(value)
         }
 
-    abstract fun obtainEvent(viewEvent: E, flag: Int = 0)
+    abstract fun obtainEvent(viewEvent: E)
 }
