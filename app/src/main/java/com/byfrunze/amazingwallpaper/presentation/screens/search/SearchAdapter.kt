@@ -68,7 +68,7 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
         fun bind(model: Wallpaper) {
             Glide.with(image)
                 .load(model.url_image)
-                .thumbnail(0.5f)
+                .thumbnail(0.75f)
                 .placeholder(R.drawable.placeholder)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .optionalCenterCrop()

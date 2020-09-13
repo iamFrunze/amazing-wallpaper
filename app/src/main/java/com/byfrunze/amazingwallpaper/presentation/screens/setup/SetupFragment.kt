@@ -1,16 +1,19 @@
 package com.byfrunze.amazingwallpaper.presentation.screens.setup
 
 import android.Manifest
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.transition.TransitionInflater
-import androidx.fragment.app.Fragment
+import android.view.Menu
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -21,9 +24,11 @@ import com.bumptech.glide.request.target.Target
 import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.presentation.helpers.injectViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_setup.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class SetupFragment : Fragment(R.layout.fragment_setup) {
@@ -41,12 +46,10 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         setEnterTransition()
+        setHasOptionsMenu(true)
+        requireActivity().text_view_title.text = "Setup"
     }
 
-
-    private fun setEnterTransition(){
-        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,6 +58,10 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
             requireContext(),
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
+        CropImage.activity()
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .start(requireContext(), this)
+
         setEnterTransition()
         postponeEnterTransition()
         val args = args.uri
@@ -65,7 +72,7 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
                 .load(args)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .optionalCenterCrop()
-                .listener(object : RequestListener<Drawable>{
+                .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
@@ -202,5 +209,25 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
         }
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        menu.findItem(R.id.action_search).isVisible = false
+    }
+
+    private fun setEnterTransition() {
+        sharedElementEnterTransition =
+            TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == RESULT_OK) {
+                val resultUri: Uri = result.uri
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                val error = result.error
+            }
+        }
+    }
 
 }

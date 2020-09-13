@@ -3,7 +3,10 @@ package com.byfrunze.amazingwallpaper.presentation.screens.search
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.transition.TransitionInflater
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -17,6 +20,7 @@ import com.byfrunze.amazingwallpaper.R
 import com.byfrunze.amazingwallpaper.data.Wallpaper
 import com.byfrunze.amazingwallpaper.presentation.helpers.injectViewModel
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.search.*
 import javax.inject.Inject
@@ -34,7 +38,15 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+
     }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        menu.findItem(R.id.action_search).setVisible(false)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -16,7 +16,12 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.byfrunze.amazingwallpaper.R
+import com.byfrunze.amazingwallpaper.presentation.screens.main.MainFragmentDirections
+import kotlinx.android.synthetic.main.app_bar_main.*
 
 class NavActivity : AppCompatActivity() {
 
@@ -26,6 +31,8 @@ class NavActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
+        toolbar.textAlignment = View.TEXT_ALIGNMENT_CENTER
         setSupportActionBar(toolbar)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -38,15 +45,16 @@ class NavActivity : AppCompatActivity() {
             AppBarConfiguration(navGraph = navController.graph, drawerLayout = drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
         setupDrawerContent(navView)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+
+
     }
 
     private fun setupDrawerContent(navigationView: NavigationView) {
         navigationView.setNavigationItemSelectedListener {
             val bundle = Bundle()
             bundle.putString("nameofcat", it.titleCondensed.toString())
+            text_view_title.text = it.title
             findNavController(R.id.nav_host_fragment).navigate(R.id.nav_main, bundle)
             true
         }
@@ -60,7 +68,10 @@ class NavActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_search) findNavController(R.id.nav_host_fragment).navigate(R.id.nav_search)
+        if (item.itemId == R.id.action_search) {
+            text_view_title.text = "Search"
+            findNavController(R.id.nav_host_fragment).navigate(R.id.action_mainFragment_to_searchFragment)
+        }
         return super.onOptionsItemSelected(item)
     }
 

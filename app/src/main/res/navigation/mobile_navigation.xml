@@ -19,7 +19,11 @@
             app:popExitAnim="@anim/fragment_open_exit" />
         <action
             android:id="@+id/action_mainFragment_to_searchFragment"
-            app:destination="@id/nav_search" />
+            app:destination="@id/nav_search"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/nav_setup"
@@ -42,10 +46,6 @@
         <action
             android:id="@+id/action_searchFragment_to_setupFragment"
             app:destination="@id/nav_setup" />
-        <action
-            android:id="@+id/action_searchFragment_to_mainFragment"
-            app:destination="@id/nav_main"
-            app:popUpTo="@id/nav_main" />
     </fragment>
 
 </navigation>

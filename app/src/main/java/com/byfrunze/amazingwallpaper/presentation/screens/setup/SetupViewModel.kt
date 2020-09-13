@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.provider.MediaStore
+import android.util.DisplayMetrics
+import android.view.Display
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -33,10 +35,12 @@ class SetupViewModel
     }
 
     private fun setupScreenLock(url: String, context: Context) {
+        val metrics = DisplayMetrics()
         viewState = viewState.copy(loadStatus = LoadStatus.Loading)
         val wallpaperManager = WallpaperManager.getInstance(context)
         Glide.with(context).asBitmap()
             .load(url)
+            .override(metrics.widthPixels, metrics.heightPixels)
             .optionalCenterCrop()
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
@@ -49,7 +53,7 @@ class SetupViewModel
                                 WallpaperManager.FLAG_LOCK
                             )
                             viewState = viewState.copy(loadStatus = LoadStatus.Success)
-                            SetupAction.ShowSnackBar("Изображение установленно на рабочий стол")
+                            SetupAction.ShowSnackBar("Изображение установленно на экран блокировки")
 
                         } else SetupAction.ShowSnackBar("Ваш телефон не поддерживает данную функцию")
                 }
@@ -60,15 +64,18 @@ class SetupViewModel
     }
 
     private fun setupScreen(url: String, context: Context) {
+        val metrics = DisplayMetrics()
+
         viewState = viewState.copy(loadStatus = LoadStatus.Loading)
         val wallpaperManager = WallpaperManager.getInstance(context)
         Glide.with(context).asBitmap()
             .load(url)
+            .override(1080,1920)
             .centerCrop()
-            .override(1080, 2220)
             .into(object : CustomTarget<Bitmap>() {
+
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    wallpaperManager.setBitmap(resource)
+                        wallpaperManager.setBitmap(resource)
                     viewAction =
                         SetupAction.ShowSnackBar("Изображение установленно на рабочий стол")
                     viewState = viewState.copy(loadStatus = LoadStatus.Success)
